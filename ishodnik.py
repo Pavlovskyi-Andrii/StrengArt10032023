@@ -1,65 +1,71 @@
 import numpy as np
-import os
+from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from matplotlib import pyplot as plt
 import random
 from tqdm import tqdm
-import matplotlib.pyplot as plt
+
+
+
+
 import sqlite3
 from PIL import Image
 from io import BytesIO
 
+#
+#
+# def readSqliteTable():
+#     try:
+#         sqliteConnection = sqlite3.connect('stringart.db')
+#         cursor = sqliteConnection.cursor()
+#         print("Connected to SQLite")
+#
+#         sqlite_select_query = """SELECT * from stringart"""
+#         cursor.execute(sqlite_select_query)
+#         records = cursor.fetchall()
+#         print("Total rows are:  ", len(records))
+#         print("Printing each row")
+#         for row in records:
+#             print("Id: ", row[0])
+#             img_data = row[1]
+#             image = Image.open(BytesIO(img_data))
+#             radius = row[2]
+#             nPins = row[3]
+#
+#             # Create an instance of StringImageCircle with the values from the database
+#             string_circle = StringImageCircle(image, radius, nPins)
+#
+#             # Do something with the StringImageCircle instance here
+#             # For example:
+#             string_circle.img.show()
+#             print(f"radius: {string_circle.radius}, nPins: {string_circle.nPins}")
+#             print("\n")
+#
+#         cursor.close()
+#
+#     except sqlite3.Error as error:
+#         print("Failed to read data from sqlite table", error)
+#     finally:
+#         if sqliteConnection:
+#             sqliteConnection.close()
+#             print("The SQLite connection is closed")
+#
+#
+#
+#
+#
+#
 
 
 
-"""
-
-# Название базы данных
-database_name = 'stringart.db'
-
-# Путь к папке для сохранения фото
-photo_folder_path = './photo'
-
-# Проверяем, существует ли папка для сохранения фото, если нет - создаем ее
-if not os.path.exists(photo_folder_path):
-    os.makedirs(photo_folder_path)
-
-# Создаем соединение с базой данных
-conn = sqlite3.connect(database_name)
-
-# Создаем курсор
-cursor = conn.cursor()
-
-# Выбираем данные из таблицы stringart с id = 1
-cursor.execute("SELECT image_data FROM stringart WHERE id = 1")
-
-# Получаем данные из ячейки Blob
-image_data = cursor.fetchone()[0]
-
-# Создаем новый файл в папке photo и записываем в него данные из ячейки Blob
-with open(os.path.join(photo_folder_path, 'image.jpg'), 'wb') as f:
-    f.write(image_data)
-
-# Закрываем курсор и соединение с базой данных
-cursor.close()
-conn.close()
-
-"""
-
-
-
-
-
-
-class StringImageCircle():
+class StringImageCircle:
     def __init__(self, img_path, radius, nPins):
         self.radius = radius
         self.nPins = nPins
         self.img, self.img_res = self.PrepareImage(img_path, radius)
         self.PinPos = self.PreparePins(radius, nPins)
         self.Lines = []
-
 
     def PrepareImage(self, img_path, radius):
         im_t = Image.open(img_path).convert('L')
@@ -75,7 +81,6 @@ class StringImageCircle():
         img = 255 - img  # negative image
 
         img_res = np.ones(img.shape) * 255
-        print("SOME text1")
         return img, img_res
 
     def PreparePins(self, radius, nPins):
@@ -94,7 +99,6 @@ class StringImageCircle():
             elif y < (2 * radius - 5):
                 y = y - random.randint(0, 5)
             PinPos.append((x, y))
-        print("SOME text2")
         return PinPos
 
     def getLineMask(self, pin1, pin2):
@@ -126,7 +130,6 @@ class StringImageCircle():
                 bestScore = tempScore
                 bestPin = nextPin
                 bestMean = tempMean
-        print("SOME text3")
         return bestPin, bestMean
 
     def SaveImage(self, image_matrix, file_path, description, color=(255, 0, 0), position=(10, 10)):
@@ -266,88 +269,11 @@ class StringImageSquare:
 
 
 
-
-#Сюда подставляем данные
-
-
-
-
-
-
-
-
-
-
-def readSqliteTable():
-
-    global image, nLines, nPins, radius, img_path  # делаем глобал
-
-
-    try:
-        sqliteConnection = sqlite3.connect('stringart.db')
-        cursor = sqliteConnection.cursor()
-        print("Connected to SQLite")
-
-        sqlite_select_query = """SELECT * from stringart"""
-        cursor.execute(sqlite_select_query)
-        records = cursor.fetchall()
-        print("Total rows are:  ", len(records))
-        print("Printing each row")
-        for row in records:
-            print("Id: ", row[0])
-            img_data = row[1]
-            img_path = Image.open(BytesIO(img_data))
-            nLines = row[2]
-            nPins = row[3]
-            radius = row[4]
-
-            # Create an instance of StringImageCircle with the values from the database
-            string_circle = StringImageCircle(img_path, nLines, nPins)
-
-            # Do something with the StringImageCircle instance here
-            # For example:
-            string_circle.img.show()
-            print(f"radius: {string_circle.radius}, nPins: {string_circle.nPins},{img_data},{nLines},{nPins},{radius}")
-            print("\n")
-
-        cursor.close()
-
-    except sqlite3.Error as error:
-        print("Failed to read data from sqlite table", error)
-        sqliteConnection.close()
-    finally:
-        if sqliteConnection:
-            sqliteConnection.close()
-            print("The SQLite connection is closed")
-
-
-
-if __name__ == '__main__':
-    readSqliteTable()
-
-
-
-
-
-nLines = None
-nPins = None
-radius = None
-
-
-img_path = "/photo/image.png"
-# radius = 500
-# nPins = 300
-# nLines = 2000
-
-
-
-
-
-
-
-
-
-
+ # Сюда подставляем данные
+img_path = "photo/image.jpg"
+radius = 500
+nPins = 200
+nLines = 2000
 
 # Usage
 if __name__ == '__main__':
@@ -360,3 +286,22 @@ if __name__ == '__main__':
 
 
 
+
+
+#
+# import sqlite3
+#
+# # создание подключения к базе данных
+# conn = sqlite3.connect('stringart.db')
+#
+# # создание объекта курсора
+# cursor = conn.cursor()
+#
+# # выполнение запроса SQL
+# cursor.execute("SELECT * FROM stringart")
+#
+# # извлечение результата запроса
+# rows = cursor.fetchall()
+# print(rows)
+# # закрытие соединения с базой данных
+# conn.close()

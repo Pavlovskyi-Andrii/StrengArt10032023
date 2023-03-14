@@ -4,6 +4,8 @@ import sqlite3
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
+
+
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URL']='sqlite3:///stringart.db'
@@ -33,6 +35,8 @@ def index():
     return render_template('index.html')
 
 # Маршрут для обработки формы
+
+
 @app.route('/generate', methods=['POST'])
 def generate():
     # Получение данных из формы
@@ -47,6 +51,7 @@ def generate():
     # Возвращение сообщения об успешном сохранении
     return 'Данные сохранены в базе данных!'
     return render_template()
+
 if __name__ == '__main__':
     create_table()
     app.run(debug=True)
@@ -60,46 +65,46 @@ if __name__ == '__main__':
 
 
 
-#
-#
-# class MyTable(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     image_data = db.Column(db.String(255))
-#     radius = db.Column(db.Integer)
-#     nPins = db.Column(db.Integer)
-#     nLines = db.Column(db.Integer)
-#
-#
-#
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-#
-#
-# @app.route('/generate', methods=['POST'])
-# def generate():
-#     # получаем данные из формы
-#     image_data = request.files['image_data'].read()
-#     radius = request.form['radius']
-#     nPins = request.form['nPins']
-#     nLines = request.form['nLines']
-#
-#     # сохраняем данные в базу данных
-#     conn = sqlite3.connect('streng1_DB.sl3')
-#     c = conn.cursor()
-#     c.execute('INSERT INTO images (image_data, radius, nPins, nLines) VALUES (?, ?, ?, ?)',
-#               (image_data, radius, nPins, nLines))
-#     conn.commit()
-#     conn.close()
-#
-#     # отправляем пользователю сообщение об успешной генерации
-#     return 'Image generated successfully!'
-#
-#
-# if __name__ == '__main__':
-#     app.run(debug=True)
 
 
+class MyTable(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    image_data = db.Column(db.String(255))
+    radius = db.Column(db.Integer)
+    nPins = db.Column(db.Integer)
+    nLines = db.Column(db.Integer)
+
+
+"""
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    # получаем данные из формы
+    image_data = request.files['image_data'].read()
+    radius = request.form['radius']
+    nPins = request.form['nPins']
+    nLines = request.form['nLines']
+
+    # сохраняем данные в базу данных
+    conn = sqlite3.connect('streng1_DB.sl3')
+    c = conn.cursor()
+    c.execute('INSERT INTO images (image_data, radius, nPins, nLines) VALUES (?, ?, ?, ?)',
+              (image_data, radius, nPins, nLines))
+    conn.commit()
+    conn.close()
+
+    # отправляем пользователю сообщение об успешной генерации
+    return 'Image generated successfully!'
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+"""
 
 
 

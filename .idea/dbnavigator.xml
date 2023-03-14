@@ -20,7 +20,9 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="26f26986-8317-44e2-8151-1b4ce37d3bec" object-ref="schemas/main/tables/stringart" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="26f26986-8317-44e2-8151-1b4ce37d3bec" dataset="main.sqlite_sequence" active-filter-id="EMPTY_FILTER" />
