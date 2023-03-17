@@ -5,7 +5,7 @@ from PIL import ImageFont
 from matplotlib import pyplot as plt
 import random
 from tqdm import tqdm
-
+import io
 
 
 
@@ -67,8 +67,15 @@ class StringImageCircle:
         self.PinPos = self.PreparePins(radius, nPins)
         self.Lines = []
 
-    def PrepareImage(self, img_path, radius):
-        im_t = Image.open(img_path).convert('L')
+    def PrepareImage(self, img_data, radius):
+        # Если img_data является путем к файлу
+        if isinstance(img_data, str):
+            with open(img_data, 'rb') as f:
+                im_t = Image.open(f).convert('L')
+        # Если img_data является данными в бинарном формате
+        else:
+            im_t = Image.open(io.BytesIO(img_data)).convert('L')
+
         w, h = im_t.size
         min_dim = min(h, w)
         top = int((h - min_dim) / 2)
@@ -219,6 +226,7 @@ class StringImageSquare:
         length = int(np.hypot(pin2[0] - pin1[0], pin2[1] - pin1[1]))
         x = np.linspace(pin1[0], pin2[0], length)
         y = np.linspace(pin1[1], pin2[1], length)
+        print("getLineMask")
         return (x.astype(int) - 1, y.astype(int) - 1)
 
     def LineScore(self, line):
@@ -244,6 +252,7 @@ class StringImageSquare:
                 bestScore = tempScore
                 bestPin = nextPin
                 bestMean = tempMean
+        print("FindBestNextPin")
         return bestPin, bestMean
 
     def SaveImage(self, image_matrix, file_path, description, color=(255, 0, 0), position=(10, 10)):
@@ -252,6 +261,7 @@ class StringImageSquare:
         font = ImageFont.truetype("font.ttf", 36)
         drawer.text(position, description, color, font=font)
         imtemp.save(file_path)
+        print("SaveImage")
 
     def Convert(self, max_lines=2000):
         currentPin = random.randint(0, self.nPins)
@@ -264,28 +274,49 @@ class StringImageSquare:
             currentPin = bestPin
         f_img = Image.fromarray(self.img_res).convert('RGB')
         f_img.save('result.jpg')
+        print("Convert")
         return self.img_res
 
 
 
 
- # Сюда подставляем данные
-img_path = "photo/image.jpg"
+#Сюда подставляем данные
+img_path = "112.png"
 radius = 500
-nPins = 200
+nPins = 400
 nLines = 2000
 
 # Usage
+
+
+
+# def readSqliteTable():
+#     conn = sqlite3.connect('stringart.db')
+#     cursor = conn.cursor()
+#
+#     cursor.execute('SELECT image_data, nLines, nPins, radius FROM stringart')
+#     row = cursor.fetchone()
+#     img_data, nLines, nPins, radius = row
+#     print(f"Виводить данние "
+#           f"Количество линий: {nLines},"
+#           f"Количество понов: {nPins},"
+#           f"Радиус круга: {radius} ")
+#
+#
+#
+#     return img_data, nLines, nPins, radius
+#
+# img_data, nLines, nPins, radius = readSqliteTable()
+#
+# string_circle = StringImageCircle(img_data, radius, nPins)
+# plt.imshow(string_circle.img_res, cmap='gray')
+# plt.show()
+
 if __name__ == '__main__':
     converter = StringImageCircle(img_path, radius, nPins)
     img_res = converter.Convert(max_lines=nLines)
     plt.imshow(img_res, cmap='gray')
     plt.show()
-
-
-
-
-
 
 
 #

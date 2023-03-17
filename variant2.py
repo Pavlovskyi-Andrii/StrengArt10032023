@@ -1,23 +1,19 @@
+
 import numpy as np
-import os
+from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from matplotlib import pyplot as plt
 import random
 from tqdm import tqdm
-import matplotlib.pyplot as plt
+import os
+
+
+
 import sqlite3
 from PIL import Image
 from io import BytesIO
-import matplotlib.pyplot as plt
 
-
-import io
-
-
-
-
-"""
 
 # Название базы данных
 database_name = 'stringart.db'
@@ -49,39 +45,24 @@ with open(os.path.join(photo_folder_path, 'image.jpg'), 'wb') as f:
 cursor.close()
 conn.close()
 
-"""
 
 
 
 
-# Класс имеет следующие методы:
-# __init__: инициализирует объект класса, принимая в качестве параметров
-# img_data - данные изображения в бинарном формате, radius - радиус круга,
-# nPins - количество креплений, используемых для создания изображения.
-# PrepareImage: метод, который подготавливает изображение для работы алгоритма.
 
-class StringImageCircle():
-    global img_data, radius, nPins
 
-    def __init__(self, img_data, radius, nPins):
-        self.img, self.img_res = self.PrepareImage(img_data, radius)
+
+class StringImageCircle:
+    def __init__(self, img_path, radius, nPins):
         self.radius = radius
         self.nPins = nPins
+        self.img, self.img_res = self.PrepareImage(img_path, radius)
+        self.PinPos = self.PreparePins(radius, nPins)
+        self.Lines = []
 
-# PrepareImage: метод, который подготавливает изображение для работы алгоритма.
-# Принимает img_data - данные изображения в бинарном формате и radius - радиус круга.
-# Метод обрезает и изменяет размер изображения, удаляет фон, который не является
-# частью изображения, и создает копию
-#  изображения для использования в дальнейшем.
-    def PrepareImage(self, img_data, radius):
-        # Если img_data является путем к файлу
-        if isinstance(img_data, str):
-            with open(img_data, 'rb') as f:
-                im_t = Image.open(f).convert('L')
-        # Если img_data является данными в бинарном формате
-        else:
-            im_t = Image.open(io.BytesIO(img_data)).convert('L')
-
+    def PrepareImage(self, img_path, radius):
+        with open(img_path, 'rb') as f:
+            im_t = Image.open(f).convert('L')
         w, h = im_t.size
         min_dim = min(h, w)
         top = int((h - min_dim) / 2)
@@ -94,15 +75,9 @@ class StringImageCircle():
         img = 255 - img  # negative image
 
         img_res = np.ones(img.shape) * 255
-        print("подготовка фото")
         return img, img_res
 
-        # PreparePins: метод, который подготавливает крепления для работы алгоритма.
-        # Принимает radius - радиус круга и nPins - количество креплений. Метод создает
-        #  массив точек для каждого крепления вокруг центра круга,
-        #  с добавлением случайного шума для уменьшения эффекта муара.
     def PreparePins(self, radius, nPins):
-
         alpha = np.linspace(0, 2 * np.pi, nPins + 1)
         PinPos = []
         for angle in alpha[0:-1]:
@@ -118,7 +93,6 @@ class StringImageCircle():
             elif y < (2 * radius - 5):
                 y = y - random.randint(0, 5)
             PinPos.append((x, y))
-        print("Обработка фото 2")
         return PinPos
 
     def getLineMask(self, pin1, pin2):
@@ -150,15 +124,12 @@ class StringImageCircle():
                 bestScore = tempScore
                 bestPin = nextPin
                 bestMean = tempMean
-        print("обработка пин")
         return bestPin, bestMean
 
     def SaveImage(self, image_matrix, file_path, description, color=(255, 0, 0), position=(10, 10)):
         imtemp = Image.fromarray(image_matrix).convert('RGB')
         drawer = ImageDraw.Draw(imtemp)
-        print("сохранение фото")
         font = ImageFont.truetype("font.ttf", 36)
-
         drawer.text(position, description, color, font=font)
         imtemp.save(file_path)
 
@@ -175,33 +146,26 @@ class StringImageCircle():
 
 
 class StringImageSquare:
-    global img_data, nPins
-    def __init__(self, img_data, dimension, nPins, noise=5):
+    def __init__(self, img_path, dimension, nPins, noise=5):
         self.dimension = dimension
         self.nPins = nPins
         self.noise = noise
-        self.img, self.img_res = self.PrepareImage(img_data, dimension)
+        self.img, self.img_res = self.PrepareImage(img_path, dimension)
         self.PinPos = self.PreparePins(dimension)
         self.Lines = []
 
-
-
-
-
-
-
-    def PrepareImage(self, img_data, dimension):
-
-        im_t = Image.open(BytesIO(img_data)).convert('L')
+    def PrepareImage(self, img_path, dimension):
+        im_t = Image.open(img_path).convert('L')
         w, h = im_t.size
         min_dim = min(h, w)
         top = int((h - min_dim) / 2)
         left = int((w - min_dim) / 2)
         im_croped = im_t.crop((left, top, left + min_dim, top + min_dim)).resize((dimension + 1, dimension + 1))
         img = np.asarray(im_croped).copy()
+
         img = 255 - img
+
         img_res = np.ones(img.shape) * 255
-        print("отримане фото")
         return img, img_res
 
     def PreparePins(self, dimension):
@@ -297,155 +261,77 @@ class StringImageSquare:
         return self.img_res
 
 
-def extract_images_from_database():
-    conn = sqlite3.connect('stringart.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT image_data FROM stringart')
-    results = cursor.fetchall()
-    conn.close()
+def main():
+    img_path = './photo/image.jpg'
+    circle_img = StringImageCircle(img_path, radius=150, nPins=400)
+    circle_img.Convert(max_lines=3000)
+    circle_img.SaveImage(circle_img.img_res, 'result_circle.jpg', 'String Art by @artpavlov')
+    plt.imshow(circle_img.img_res, cmap='Greys_r')
+    plt.show()
 
-    html = '<html><body>'
-    for row in results:
-        img_data = row[0]
-        im_t = Image.open(BytesIO(img_data))
-        html += '<img src="data:image/png;base64,{0}">'.format(im_t)
-    html += '</body></html>'
-    with open('result.html', 'w') as f:
-        f.write(html)
+    square_img = StringImageSquare(img_path, dimension=400, nPins=200)
+    square_img.Convert(max_lines=3000)
+    square_img.SaveImage(square_img.img_res, 'result_square.jpg', 'String Art by @artpavlov')
+    plt.imshow(square_img.img_res, cmap='Greys_r')
+    plt.show()
 
 
+if __name__ == '__main__':
+    main()
 
-def readSqliteTable():
-    conn = sqlite3.connect('stringart.db')
-    cursor = conn.cursor()
-
-    cursor.execute('SELECT image_data, nLines, nPins, radius FROM stringart')
-    row = cursor.fetchone()
-    img_data, nLines, nPins, radius = row
-    print(f"Виводить данние "
-          f"Количество линий: {nLines},"
-          f"Количество понов: {nPins},"
-          f"Радиус круга: {radius} ")
-
-
-    print(img_data)
-    return img_data, nLines, nPins, radius
-
-img_data, nLines, nPins, radius = readSqliteTable()
-
-string_circle = StringImageCircle(img_data, radius, nPins)
-plt.imshow(string_circle.img_res, cmap='gray')
-plt.show()
-
-
-string_square = StringImageSquare(img_data, radius, nPins)
-plt.imshow(string_square.img_res, cmap='gray')
-plt.show()
-
-
-
-
-
-
-
-#Сюда подставляем данные
-
-#
-# def readSqliteTable():
-#     global img_data, nLines, nPins, radius
-#     try:
-#         sqliteConnection = sqlite3.connect('stringart.db')
-#         cursor = sqliteConnection.cursor()
-#         print("Connected to SQLite")
-#
-#         sqlite_select_query = """SELECT * from stringart"""
-#         cursor.execute(sqlite_select_query)
-#         records = cursor.fetchall()
-#         print("Total rows are:  ", len(records))
-#         print("Printing each row")
-#         for row in records:
-#             print("Id: ", row[0])
-#             img_path  = row[1]
-#             img_data = Image.open(BytesIO(img_path))
-#             nLines = row[2]
-#             nPins = row[3]
-#             radius = row[4]
-#
-#             # Создайте экземпляр StringImageCircle со значениями из базы данных
-#             string_circle = StringImageCircle(img_data, radius, nPins)
-#
-#             # Сделайте что-нибудь с экземпляром StringImageCircle здесь
-#             # пример вывода
-#             string_circle.img.show()
-#             print(f"Радиус: {string_circle.radius}, Количестов гвоздиков : {string_circle.nPins}")
-#
-#             print("\n")
-#
-#         cursor.close()
-#
-#     except sqlite3.Error as error:
-#         print("Failed to read data from sqlite table", error)
-#         sqliteConnection.close()
-#     finally:
-#         if sqliteConnection:
-#             sqliteConnection.close()
-#             print("The SQLite connection is closed")
-#
-#     return img_data, nLines, nPins, radius
-#
-# # визов функций чтоб получить значение переменни
-# img_data, nLines, nPins, radius = readSqliteTable()
-#
-# # Now you can use the variables in other parts of your code
-#
-#
-#
-# if __name__ == '__main__':
-#     converter = StringImageCircle(img_data, radius, nPins)
-#     converter.img.show()
-#     #______________Добавлен из оригинал
-#     img_res = converter.Convert(max_lines=nLines)
-#     plt.imshow(img_res, cmap='gray')
-#     plt.show()
-
-
-
-
-# if __name__ == '__main__':
-# img_res = converter.Convert(max_lines=nLines)
-#     plt.imshow(img_res, cmap='gray')
-#     plt.show()
-
-
-
-
-# img_path = 'photo/image.jpg'
-# if not os.path.exists(img_path):
-#     raise FileNotFoundError(f'Image not found at {img_path}')
-# string_circle = StringImageCircle(img_path, radius, nPins)
-
-
-
-
-# img_path =None            # "/photo/image.png"
-# nLines = None
-# nPins = None
-# radius = None
-#img_path = "/photo/image.png"
+ # Сюда подставляем данные
+# img_path = "/photo/image.jpg"
 # radius = 500
-# nPins = 300
+# nPins = 400
 # nLines = 2000
 
 # Usage
+
+#
+# def readSqliteTable():
+#     conn = sqlite3.connect('stringart.db')
+#     cursor = conn.cursor()
+#
+#     cursor.execute('SELECT image_data, nLines, nPins, radius FROM stringart')
+#     row = cursor.fetchone()
+#     img_path, nLines, nPins, radius = row
+#     print(f"Виводить данние "
+#           f"Количество линий: {nLines},"
+#           f"Количество понов: {nPins},"
+#           f"Радиус круга: {radius} ")
+#
+#
+#
+#     return img_path, nLines, nPins, radius
+#
+# img_path, nLines, nPins, radius = readSqliteTable()
+#
+# string_circle = StringImageCircle(img_path, radius, nPins)
+# plt.imshow(string_circle.img_res, cmap='gray')
+# plt.show()
+#
 # if __name__ == '__main__':
-#     # global img_path, radius, nPins, nLines
-#     # converter = StringImageCircle(img_path, radius, nPins)
-#     string_circle = StringImageCircle(img_data, radius, nPins)
+#     converter = StringImageCircle(img_path, radius, nPins)
 #     img_res = converter.Convert(max_lines=nLines)
 #     plt.imshow(img_res, cmap='gray')
 #     plt.show()
+#
+# print(os.getcwd())
 
-
-
-
-
+#
+# import sqlite3
+#
+# # создание подключения к базе данных
+# conn = sqlite3.connect('stringart.db')
+#
+# # создание объекта курсора
+# cursor = conn.cursor()
+#
+# # выполнение запроса SQL
+# cursor.execute("SELECT * FROM stringart")
+#
+# # извлечение результата запроса
+# rows = cursor.fetchall()
+# print(rows)
+# # закрытие соединения с базой данных
+# conn.close()
