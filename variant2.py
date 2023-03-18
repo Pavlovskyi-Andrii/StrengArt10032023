@@ -20,6 +20,9 @@ database_name = 'stringart.db'
 
 # Путь к папке для сохранения фото
 photo_folder_path = './photo'
+file_name = 'image.jpg'
+
+
 
 # Проверяем, существует ли папка для сохранения фото, если нет - создаем ее
 if not os.path.exists(photo_folder_path):
@@ -32,12 +35,14 @@ conn = sqlite3.connect(database_name)
 cursor = conn.cursor()
 
 # Выбираем данные из таблицы stringart с id = 1
+
 cursor.execute("SELECT image_data FROM stringart WHERE id = 1")
 
 # Получаем данные из ячейки Blob
 image_data = cursor.fetchone()[0]
 
 # Создаем новый файл в папке photo и записываем в него данные из ячейки Blob
+
 with open(os.path.join(photo_folder_path, 'image.jpg'), 'wb') as f:
     f.write(image_data)
 
@@ -129,7 +134,9 @@ class StringImageCircle:
     def SaveImage(self, image_matrix, file_path, description, color=(255, 0, 0), position=(10, 10)):
         imtemp = Image.fromarray(image_matrix).convert('RGB')
         drawer = ImageDraw.Draw(imtemp)
-        font = ImageFont.truetype("font.ttf", 36)
+        font_path = os.path.join(os.getcwd(), 'fonts\Roboto-Bold.ttf')  # replace 'font.ttf' with the name of your font file
+        font_size = 36
+        font = ImageFont.truetype(font_path, font_size)
         drawer.text(position, description, color, font=font)
         imtemp.save(file_path)
 
@@ -243,7 +250,11 @@ class StringImageSquare:
     def SaveImage(self, image_matrix, file_path, description, color=(255, 0, 0), position=(10, 10)):
         imtemp = Image.fromarray(image_matrix).convert('RGB')
         drawer = ImageDraw.Draw(imtemp)
-        font = ImageFont.truetype("font.ttf", 36)
+
+        font_path = os.path.join(os.getcwd(), 'fonts\Roboto-Bold.ttf')  # replace 'font.ttf' with the name of your font file
+        font_size = 36
+
+        font = ImageFont.truetype(font_path, font_size)
         drawer.text(position, description, color, font=font)
         imtemp.save(file_path)
 
@@ -264,20 +275,19 @@ class StringImageSquare:
 def main():
     img_path = './photo/image.jpg'
     circle_img = StringImageCircle(img_path, radius=150, nPins=400)
-    circle_img.Convert(max_lines=3000)
+    circle_img.Convert(max_lines=1000)
     circle_img.SaveImage(circle_img.img_res, 'result_circle.jpg', 'String Art by @artpavlov')
     plt.imshow(circle_img.img_res, cmap='Greys_r')
     plt.show()
 
-    square_img = StringImageSquare(img_path, dimension=400, nPins=200)
-    square_img.Convert(max_lines=3000)
-    square_img.SaveImage(square_img.img_res, 'result_square.jpg', 'String Art by @artpavlov')
-    plt.imshow(square_img.img_res, cmap='Greys_r')
-    plt.show()
-
+    # square_img = StringImageSquare(img_path, dimension=400, nPins=200)
+    # square_img.Convert(max_lines=1000)
+    # square_img.SaveImage(square_img.img_res, 'result_square.jpg', 'String Art by @artpavlov')
+    # plt.imshow(square_img.img_res, cmap='Greys_r')
+    # plt.show()
 
 if __name__ == '__main__':
-    main()
+     main()
 
  # Сюда подставляем данные
 # img_path = "/photo/image.jpg"

@@ -237,6 +237,7 @@ class StringImageSquare:
         score_mean = np.mean(line) if len(line) > 0 else 0
         return score, score_mean
 
+
     def FindBestNextPin(self, currentPin):
         bestScore = -999999
         bestPin = -1

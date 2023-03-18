@@ -12,7 +12,7 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="42e02ff6-cd8b-4d45-ba70-dfc1bf89caa8">
+    <connection id="411af55e-f16b-4308-9e8a-ff4498719aac">
       <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
@@ -22,12 +22,10 @@
     </last-used-providers>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="42e02ff6-cd8b-4d45-ba70-dfc1bf89caa8" object-ref="schemas/main/tables/stringart" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="42e02ff6-cd8b-4d45-ba70-dfc1bf89caa8" dataset="main.stringart" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="411af55e-f16b-4308-9e8a-ff4498719aac" dataset="main.stringart" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -46,7 +44,7 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="42e02ff6-cd8b-4d45-ba70-dfc1bf89caa8" active="true" signed="true">
+      <connection id="411af55e-f16b-4308-9e8a-ff4498719aac" active="true" signed="true">
         <database>
           <name value="Connection" />
           <description value="" />
@@ -460,7 +458,7 @@
       <transactions>
         <uncommitted-changes>
           <on-project-close value="ASK" />
-          <on-disconnect value="ASK" />
+          <on-disconnect value="COMMIT" />
           <on-autocommit-toggle value="ASK" />
         </uncommitted-changes>
         <multiple-uncommitted-changes>
