@@ -1,12 +1,11 @@
-
-
 import sqlite3
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
-
+import os
 
 
 app = Flask(__name__)
+
 
 app.config['SQLALCHEMY_DATABASE_URL']='sqlite3:///stringart.db'
 
@@ -21,6 +20,36 @@ def create_table():
     conn.commit()
     conn.close()
 
+
+# функция для получения пути к фотографии по ее номеру
+def get_photo_path(id):
+    return os.path.join("db_data" + str(id) + ".png")
+
+@app.route("/")
+def index():
+    try:
+        # установление соединения с базой данных
+        conn = sqlite3.connect('stringart.db')
+        c = conn.cursor()
+
+        # выборка всех строк из таблицы
+        c.execute("SELECT * FROM stringart")
+
+        # получение результатов запроса
+        rows = c.fetchall()
+
+        # закрытие соединения с базой данных
+        conn.close()
+
+        # формирование списка с путями к фотографиям
+        photos = [get_photo_path(row[0]) for row in rows]
+
+        # рендеринг шаблона и передача списка фотографий в контекст
+        return render_template("index.html", photos=photos)
+
+    except Exception as e:
+        return str(e)
+
 # Функция для сохранения данных из формы в базу данных
 def save_to_db(image_data, radius, nPins, nLines):
     conn = sqlite3.connect('stringart.db')
@@ -29,14 +58,45 @@ def save_to_db(image_data, radius, nPins, nLines):
     conn.commit()
     conn.close()
 
-# Маршрут для отображения формы
-@app.route('/')
-def index():
-    return render_template('index.html')
+# обработчик POST запроса для формы
+@app.route('/submit_form', methods=['POST'])
+def submit_form():
+    # получение данных из формы
+    image_data = request.form['image_data']
+    radius = request.form['radius']
+    nPins = request.form['nPins']
+    nLines = request.form['nLines']
 
-# Маршрут для обработки формы
+    # сохранение данных в базу данных
+    save_to_db(image_data, radius, nPins, nLines)
+
+    # перенаправление на главную страницу
+    return redirect("/")
 
 
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+
+@app.route('/portfolio')
+def portfolio():
+    return render_template('portfolio.html')
+
+
+@app.route('/thank')
+def thank():
+    return render_template('thank.html')
+
+
+
+
+
+
+
+
+#Маршрут для обработки формы
 @app.route('/generate', methods=['POST'])
 def generate():
     # Получение данных из формы
@@ -49,62 +109,17 @@ def generate():
     save_to_db(image_data, radius, nPins, nLines)
 
     # Возвращение сообщения об успешном сохранении
-    return 'Данные сохранены в базе данных!'
-    return render_template()
 
-if __name__ == '__main__':
-    create_table()
-    app.run(debug=True)
+    return render_template('generate.html')
 
 
-
-
-
-
-
-
-
-
-
-
-class MyTable(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    image_data = db.Column(db.String(255))
-    radius = db.Column(db.Integer)
-    nPins = db.Column(db.Integer)
-    nLines = db.Column(db.Integer)
-
-
-"""
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
-@app.route('/generate', methods=['POST'])
-def generate():
-    # получаем данные из формы
-    image_data = request.files['image_data'].read()
-    radius = request.form['radius']
-    nPins = request.form['nPins']
-    nLines = request.form['nLines']
-
-    # сохраняем данные в базу данных
-    conn = sqlite3.connect('streng1_DB.sl3')
-    c = conn.cursor()
-    c.execute('INSERT INTO images (image_data, radius, nPins, nLines) VALUES (?, ?, ?, ?)',
-              (image_data, radius, nPins, nLines))
-    conn.commit()
-    conn.close()
-
-    # отправляем пользователю сообщение об успешной генерации
-    return 'Image generated successfully!'
 
 
 if __name__ == '__main__':
     app.run(debug=True)
 
-"""
+
+# Маршрут для отображения формы
 
 
 
@@ -112,61 +127,6 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
-# from flask import Flask, request
-# from flask_sqlalchemy import SQLAlchemy
-#
-# app = Flask(__name__)
-# app.config["SQLALCHEMY_DATABASE_URI"]="streng1_DB.db"
-# db = SQLAlchemy(app)
-#
-#
-# @app.route("/")
-#
-#
-#
-# class Image(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     image_data = db.Column(db.LargeBinary)
-#     radius = db.Column(db.integer.request.form['radius'])
-#     nPins = int(request.form['nPins'])
-#     nLines = int(request.form['nLines'])
-#
-#     def __repr__(self):  # указіваем какое значение возвращаем с базы данных
-#         return "<Contact %r>" % self.id
-#
-#
-#
-#
-#
-# def upload_image("/", methods=["POST","GET"]):
-#     if request.method == "POST":
-#
-#         image_file = request.files['image']
-#         image_data = image_file.read()
-#         new_image = Image(image_data=image_data)
-#         radius = request.form["radius"]
-#         nPins = request.form["nPins"]
-#         nLines = request.form["nLines"]
-#
-#         image = Image(image_file=image_file, radius=radius, nPins=nPins, nLines=nLines)
-#
-#
-#         try:
-#             db.session.add(new_image)
-#             db.session.commit()
-#     else:
-#
-#
-#         return 'Image uploaded successfully'
-#
-#
-#
-# if __name__ == '__main__':
-#     app.run(debug=True)
 
 
 

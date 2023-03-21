@@ -2,54 +2,135 @@ import numpy as np
 import os
 from PIL import ImageDraw
 from PIL import ImageFont
-from matplotlib import pyplot as plt
 import random
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 import sqlite3
 from PIL import Image
 from io import BytesIO
 import matplotlib.pyplot as plt
-
-
 import io
 
 
 
 
-"""
 
-# Название базы данных
-database_name = 'stringart.db'
+def write_to_file(data, filename):
+    # Преобразование двоичных данных в нужный формат
+    with open(filename, 'wb') as file:
+        file.write(data)
+    print("Данные из blob сохранены в: ", filename, "\n")
 
-# Путь к папке для сохранения фото
-photo_folder_path = './photo'
+def read_blob_data():
+    try:
+        sqlite_connection = sqlite3.connect('stringart.db')
+        cursor = sqlite_connection.cursor()
+        print("Подключен к SQLite")
 
-# Проверяем, существует ли папка для сохранения фото, если нет - создаем ее
-if not os.path.exists(photo_folder_path):
-    os.makedirs(photo_folder_path)
+        sql_fetch_blob_query = """SELECT * from stringart"""
+        cursor.execute(sql_fetch_blob_query)
+        records = cursor.fetchall()
+        for row in records:
+            print("Id = ", row[0], "image_data = ")
+            id = row[0]
+            image_data  = row[1]
 
-# Создаем соединение с базой данных
-conn = sqlite3.connect(database_name)
+            print("Сохранение изображения  \n")
+            photo_path = os.path.join(f"db_data+{id}" +".png")
 
-# Создаем курсор
-cursor = conn.cursor()
+            write_to_file(image_data, photo_path)
 
-# Выбираем данные из таблицы stringart с id = 1
-cursor.execute("SELECT image_data FROM stringart WHERE id = 1")
+        cursor.close()
 
-# Получаем данные из ячейки Blob
-image_data = cursor.fetchone()[0]
+    except sqlite3.Error as error:
+        print("Ошибка при работе с SQLite", error)
+    finally:
+        if sqlite_connection:
+            sqlite_connection.close()
+            print("Соединение с SQLite закрыто")
 
-# Создаем новый файл в папке photo и записываем в него данные из ячейки Blob
-with open(os.path.join(photo_folder_path, 'image.jpg'), 'wb') as f:
-    f.write(image_data)
+read_blob_data()
 
-# Закрываем курсор и соединение с базой данных
-cursor.close()
-conn.close()
 
-"""
+
+
+
+
+
+
+
+# # Имя файла базы данных
+# db_filename = 'stringart.db'
+#
+# # Папка, в которую будут сохранены изображения
+# image_folder = 'image'
+#
+# # Подключение к базе данных
+# connection = sqlite3.connect(db_filename)
+#
+# # Получение курсора
+# cursor = connection.cursor()
+#
+# # Получение всех данных из таблицы stringart
+# cursor.execute('SELECT * FROM stringart')
+#
+# # Извлечение всех строк с данными
+# for row in cursor.fetchall():
+#     # Получение id изображения
+#     image_id = row[0]
+#
+#     # Получение бинарных данных изображения
+#     image_data = row[1]
+#
+#     # Создание объекта изображения
+#     image = Image.frombytes('RGB', (300, 300), image_data)
+#
+#     # Создание папки, если она не существует
+#     if not os.path.exists(image_folder):
+#         os.makedirs(image_folder)
+#
+#     # Сохранение изображения в файл
+#     image.save(os.path.join(image_folder, f'{image_id}.jpg'))
+#
+# # Закрытие соединения с базой данных
+# connection.close()
+
+
+
+
+
+#
+#
+# # Название базы данных
+# database_name = 'stringart.db'
+#
+# # Путь к папке для сохранения фото
+# photo_folder_path = './photos'
+#
+# # Проверяем, существует ли папка для сохранения фото, если нет - создаем ее
+# if not os.path.exists(photo_folder_path):
+#     os.makedirs(photo_folder_path)
+#
+# # Создаем соединение с базой данных
+# conn = sqlite3.connect(database_name)
+#
+# # Создаем курсор
+# cursor = conn.cursor()
+#
+# # Выбираем данные из таблицы stringart с id = 1
+# cursor.execute("SELECT image_data FROM stringart WHERE id = 1")
+#
+# # Получаем данные из ячейки Blob
+# image_data = cursor.fetchone()[0]
+#
+# # Создаем новый файл в папке photos и записываем в него данные из ячейки Blob
+# with open(os.path.join(photo_folder_path, 'image.jpg'), 'wb') as f:
+#     f.write(image_data)
+#
+# # Закрываем курсор и соединение с базой данных
+# cursor.close()
+# conn.close()
+
+
 
 
 
@@ -360,6 +441,27 @@ img_data, nLines, nPins, radius = readSqliteTable()
 string_circle = StringImageCircle(img_data, radius, nPins)
 plt.imshow(string_circle.img_res, cmap='gray')
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #
 #
 # string_square = StringImageSquare(img_data, radius, nPins)
@@ -447,7 +549,7 @@ plt.show()
 
 
 
-# img_path = 'photo/image.jpg'
+# img_path = 'photos/image.jpg'
 # if not os.path.exists(img_path):
 #     raise FileNotFoundError(f'Image not found at {img_path}')
 # string_circle = StringImageCircle(img_path, radius, nPins)
@@ -455,11 +557,11 @@ plt.show()
 
 
 
-# img_path =None            # "/photo/image.png"
+# img_path =None            # "/photos/image.png"
 # nLines = None
 # nPins = None
 # radius = None
-#img_path = "/photo/image.png"
+#img_path = "/photos/image.png"
 # radius = 500
 # nPins = 300
 # nLines = 2000

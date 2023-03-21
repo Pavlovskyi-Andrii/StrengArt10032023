@@ -19,7 +19,7 @@ from io import BytesIO
 database_name = 'stringart.db'
 
 # Путь к папке для сохранения фото
-photo_folder_path = './photo'
+photo_folder_path = './photos'
 file_name = 'image.jpg'
 
 
@@ -41,7 +41,7 @@ cursor.execute("SELECT image_data FROM stringart WHERE id = 1")
 # Получаем данные из ячейки Blob
 image_data = cursor.fetchone()[0]
 
-# Создаем новый файл в папке photo и записываем в него данные из ячейки Blob
+# Создаем новый файл в папке photos и записываем в него данные из ячейки Blob
 
 with open(os.path.join(photo_folder_path, 'image.jpg'), 'wb') as f:
     f.write(image_data)
@@ -273,7 +273,7 @@ class StringImageSquare:
 
 
 def main():
-    img_path = './photo/image.jpg'
+    img_path = 'photos/image.jpg'
     circle_img = StringImageCircle(img_path, radius=150, nPins=400)
     circle_img.Convert(max_lines=1000)
     circle_img.SaveImage(circle_img.img_res, 'result_circle.jpg', 'String Art by @artpavlov')
@@ -290,7 +290,7 @@ if __name__ == '__main__':
      main()
 
  # Сюда подставляем данные
-# img_path = "/photo/image.jpg"
+# img_path = "/photos/image.jpg"
 # radius = 500
 # nPins = 400
 # nLines = 2000

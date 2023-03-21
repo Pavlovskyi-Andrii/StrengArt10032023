@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+String Art Generator
+{% endblock %}
+
+{% block body %}
+
+{% for photo in photos %}
+        <img src="{{ photo }}" alt="Фотография">
+    {% endfor %}
+
+
+{% endblock %}
+
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <title>Фотографии</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Фотографии</h1>-->
+
+<!--    {% for photo in photos %}-->
+<!--        <img src="{{ photo }}" alt="Фотография">-->
+<!--    {% endfor %}-->
+
+<!--</body>-->
+<!--</html>-->

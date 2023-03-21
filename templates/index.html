@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>String Art Generator</title>
-  </head>
-  <body>
-    <h1>String Art Generator</h1>
+{% extends 'base.html' %}
+
+{% block title %}
+String Art Generator
+{% endblock %}
+
+{% block body %}
+
+
+<h1>Пример фотографий</h1>
+    <div class="gallery">
+      {% for photo in photos %}
+        <div class="photo">
+          <img src="{{ photo }}" alt="Фото">
+        </div>
+      {% endfor %}
+    </div>
+
+    {% for photo in photos %}
+		<img src="{{ photo }}">
+	{% endfor %}
+
+
+<h1>String Art Generator</h1>
+
+<div class="right">
     <form action="{{ url_for('generate') }}" method="post" enctype="multipart/form-data">
       <label for="image">Choose an image:</label>
       <input type="file" name="image_data" id="image"><br><br>
@@ -13,8 +32,14 @@
       <label for="nPins">Number of pins:</label>
       <input type="number" name="nPins" id="nPins" value="260"><br><br>
       <label for="nLines">Number of lines:</label>
-      <input type="number" name="nLines" id="nLines" value="2000"><br><br>
+      <input type="number" name="nLines" id="nLines" value="1999"><br><br>
       <input type="submit" value="Generate">
     </form>
-  </body>
-</html>
+</div>
+
+{% endblock %}
+
+
+
+
+
